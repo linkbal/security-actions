@@ -19,6 +19,14 @@ RISK_TO_LEVEL = {
     "Informational": "none",
 }
 
+# Maps to GitHub Code Scanning severity: Critical(9+) High(7-8.9) Medium(4-6.9) Low(0.1-3.9)
+RISK_TO_SECURITY_SEVERITY = {
+    "High": "8.0",
+    "Medium": "5.0",
+    "Low": "2.0",
+    "Informational": "0.0",
+}
+
 
 def convert(zap: dict) -> dict:
     rules = []
@@ -39,6 +47,10 @@ def convert(zap: dict) -> dict:
                     "fullDescription": {"text": alert.get("desc", "")},
                     "defaultConfiguration": {"level": level},
                     "helpUri": alert.get("reference", ""),
+                    "properties": {
+                        "security-severity": RISK_TO_SECURITY_SEVERITY.get(risk_word, "0.0"),
+                        "tags": ["security"],
+                    },
                 })
 
             instances = alert.get("instances") or [{"uri": site["@name"]}]
