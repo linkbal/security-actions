@@ -2,6 +2,15 @@
 """Convert OWASP ZAP JSON report to SARIF 2.1.0."""
 import json
 import sys
+from urllib.parse import urlparse
+
+
+def url_to_relative_uri(url: str) -> str:
+    """Convert URL to a relative URI path (strips scheme to avoid SARIF upload rejection)."""
+    parsed = urlparse(url)
+    # e.g. https://alb.machicon.jp/path -> alb.machicon.jp/path
+    path = parsed.path.lstrip("/") or ""
+    return f"{parsed.netloc}/{path}" if parsed.netloc else url
 
 RISK_TO_LEVEL = {
     "High": "error",
@@ -39,7 +48,7 @@ def convert(zap: dict) -> dict:
                     "message": {"text": alert.get("desc", "")[:512]},
                     "locations": [{
                         "physicalLocation": {
-                            "artifactLocation": {"uri": inst.get("uri", "")},
+                            "artifactLocation": {"uri": url_to_relative_uri(inst.get("uri", ""))},
                             "region": {"startLine": 1},
                         }
                     }],
