@@ -1,0 +1,37 @@
+name: zap2sarif
+description: Convert OWASP ZAP JSON report to SARIF and upload to GitHub Code Scanning
+author: Linkbal Inc.
+
+branding:
+  icon: shield
+  color: orange
+
+inputs:
+  json_report:
+    description: Path to ZAP JSON report
+    required: false
+    default: report_json.json
+  sarif_output:
+    description: Path for SARIF output file
+    required: false
+    default: zap-results.sarif
+  category:
+    description: Category for Code Scanning (use to distinguish multiple targets)
+    required: false
+    default: zap
+
+runs:
+  using: composite
+  steps:
+    - name: Convert ZAP JSON to SARIF
+      shell: bash
+      run: |
+        python3 "${{ github.action_path }}/zap2sarif.py" \
+          "${{ inputs.json_report }}" \
+          "${{ inputs.sarif_output }}"
+
+    - name: Upload SARIF to Code Scanning
+      uses: github/codeql-action/upload-sarif@v4
+      with:
+        sarif_file: ${{ inputs.sarif_output }}
+        category: ${{ inputs.category }}
