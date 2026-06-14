@@ -1,0 +1,32 @@
+name: nmap2sarif
+description: Convert nmap XML output (with vulners) to SARIF and upload to GitHub Code Scanning
+
+inputs:
+  xml_report:
+    description: Path to nmap XML output
+    required: false
+    default: nmap-results.xml
+  sarif_output:
+    description: Path for SARIF output file
+    required: false
+    default: nmap-results.sarif
+  category:
+    description: Category for Code Scanning
+    required: false
+    default: nmap
+
+runs:
+  using: composite
+  steps:
+    - name: Convert nmap XML to SARIF
+      shell: bash
+      run: |
+        python3 "${{ github.action_path }}/nmap2sarif.py" \
+          "${{ inputs.xml_report }}" \
+          "${{ inputs.sarif_output }}"
+
+    - name: Upload SARIF to Code Scanning
+      uses: github/codeql-action/upload-sarif@v4
+      with:
+        sarif_file: ${{ inputs.sarif_output }}
+        category: ${{ inputs.category }}

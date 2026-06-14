@@ -1,32 +1,25 @@
-# zap2sarif
+# security-actions
 
-Convert [OWASP ZAP](https://www.zaproxy.org/) JSON report to SARIF 2.1.0 and upload to GitHub Code Scanning.
+Security scan result converters for GitHub Code Scanning.
 
-## Usage
+## Actions
+
+### zap2sarif
+
+Convert OWASP ZAP JSON report to SARIF.
 
 ```yaml
-- name: Run ZAP Baseline Scan
-  uses: zaproxy/action-baseline@v0.15.0
+- uses: linkbal/security-actions/zap2sarif@v1
   with:
-    target: https://example.com
-    allow_issue_writing: false
-    fail_action: false
-
-- name: Upload ZAP results to Code Scanning
-  uses: linkbal/zap2sarif@main
-  with:
-    category: zap-example.com  # distinguish multiple targets
+    category: zap-scan
 ```
 
-## Inputs
+### nmap2sarif
 
-| Input | Description | Default |
-|---|---|---|
-| `json_report` | Path to ZAP JSON report | `report_json.json` |
-| `sarif_output` | Path for SARIF output file | `zap-results.sarif` |
-| `category` | Category for Code Scanning | `zap` |
+Convert nmap XML output (with `--script vulners`) to SARIF.
 
-## Notes
-
-- Requires `security-events: write` permission.
-- When scanning multiple targets, set a unique `category` per target to avoid results overwriting each other.
+```yaml
+- uses: linkbal/security-actions/nmap2sarif@v1
+  with:
+    category: nmap-scan
+```
