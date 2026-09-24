@@ -23,3 +23,7 @@ Convert nmap XML output (with `--script vulners`) to SARIF.
   with:
     category: nmap-scan
 ```
+
+## Inputs
+
+Both actions accept `upload` (default `'true'`). Set `upload: 'false'` to only convert to SARIF without uploading to Code Scanning.
